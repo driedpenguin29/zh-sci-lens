@@ -93,7 +93,7 @@ skill/
 
 ## 许可
 
-未附许可证。要公开复用的话，加一个（MIT / CC BY 都合适），告诉我一声。
+MIT（见 [`LICENSE`](LICENSE)）。插件 manifest 里本来写的也是 MIT，两处保持一致。
 
 ## 参考
 
