@@ -1,0 +1,56 @@
+{
+  "name": "dsh-zh-sci-lens",
+  "version": "0.5.0",
+  "private": false,
+  "type": "module",
+  "description": "双镜批注本：把一段中文改得更严谨或更通俗，出一份带原文批注、改写版、事实核对与学习建议的报告，可导出 HTML / Markdown。",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "./index.js",
+    "./client.js",
+    "index.js",
+    "client.js",
+    "lib/**/*.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "README.md",
+    "src/client.ui.js",
+    "build.mjs"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": ">=4.0.0 <5",
+    "react": ">=18.2.0 <19"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "check": "node build.mjs --check && node --check client.js && node --check index.js"
+  },
+  "license": "MIT"
+}

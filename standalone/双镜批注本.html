@@ -1,0 +1,1273 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>双镜批注本 · 中文表达双镜片</title>
+<style id="system">
+:root{
+  --paper:#FAF7F1; --paper2:#F3ECE0; --paper3:#FFFDF8;
+  --ink:#17140F; --ink2:#37312A; --muted:#6E655A; --faint:#9A9184;
+  --rule:#E2DACD; --rule2:#CFC4B2;
+  --seal:#A6342A; --seal2:#8A2A21; --sealSoft:#F2E3DD;
+  --good:#1B5E45; --warn:#8A5A06; --bad:#8E211C;
+  --serif:"Songti SC","Source Han Serif SC","Noto Serif CJK SC",STSong,"Songti TC",Georgia,serif;
+  --sans:"PingFang SC","Hiragino Sans GB","Source Han Sans SC","Noto Sans CJK SC",-apple-system,"Segoe UI",sans-serif;
+  --s1:6px; --s2:10px; --s3:16px; --s4:24px; --s5:36px; --s6:56px; --s7:84px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--sans);font-size:16px;line-height:1.7;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+::selection{background:var(--sealSoft);color:var(--seal2)}
+a{color:var(--seal);text-decoration:none;border-bottom:1px solid rgba(166,52,42,.35)}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+textarea{font:inherit;color:inherit}
+
+.wrap{max-width:1040px;margin:0 auto;padding:0 clamp(18px,4vw,52px)}
+
+/* 书眉 */
+.mast{
+  display:flex;align-items:baseline;justify-content:space-between;gap:18px;
+  padding:26px 0 12px;border-bottom:1px solid var(--rule2);
+  font-size:12px;letter-spacing:.02em;
+}
+.mast .l{font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--ink2)}
+.mast .r{color:var(--faint);letter-spacing:.06em}
+.mast .r b{font-weight:600;color:var(--ink2);letter-spacing:0}
+
+/* 封面 */
+.cover{padding:var(--s7) 0 var(--s6)}
+.eyebrow{font-size:11.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--faint)}
+.cover h1{
+  font-family:var(--serif);font-weight:700;
+  font-size:clamp(30px,4.6vw,50px);line-height:1.28;letter-spacing:-.012em;
+  margin:20px 0 0;
+}
+.cover h1 em{font-style:normal;color:var(--seal)}
+.cover h1 .c{margin-right:-.24em}
+.standfirst{
+  font-family:var(--serif);font-size:19px;line-height:1.85;color:var(--ink2);
+  max-width:31em;margin:18px 0 0;
+}
+.standfirst b{font-weight:700;color:var(--ink)}
+
+/* 输入 */
+.field{margin-top:var(--s6);border-bottom:1px solid var(--rule2)}
+.field .lab{
+  display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);
+  padding-bottom:8px;
+}
+#src{
+  display:block;width:100%;min-height:190px;resize:vertical;
+  background:transparent;border:0;outline:none;
+  font-family:var(--serif);font-size:18px;line-height:2.02;color:var(--ink);
+  padding:10px 0 16px;
+}
+#src::placeholder{color:var(--faint);opacity:.85}
+
+/* 指标 */
+.meter{
+  display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px;
+  padding:12px 2px 0;font-size:12.5px;color:var(--muted);min-height:22px;
+}
+.meter .n{font-variant-numeric:tabular-nums;font-weight:600;color:var(--ink2)}
+.meter .dot{display:inline-block;width:5px;height:5px;border-radius:50%;margin-right:6px;vertical-align:2px;background:var(--faint)}
+.meter .dot.ok{background:var(--good)}
+.meter .dot.no{background:var(--bad)}
+.meter .sep{color:var(--rule2)}
+.meter .none{color:var(--faint)}
+
+/* 两种改法 */
+.pick{margin-top:var(--s6);border-top:1px solid var(--rule2)}
+.pick .hd{
+  font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);
+  padding:14px 0 0;
+}
+.mode{
+  display:grid;grid-template-columns:190px minmax(0,1fr) 34px;align-items:start;gap:26px;
+  width:100%;text-align:left;padding:26px 2px 24px;
+  border-bottom:1px solid var(--rule);
+  transition:background .16s ease;position:relative;
+}
+.mode:hover:not(:disabled){background:var(--paper3)}
+.mode:disabled{cursor:not-allowed}
+.mode:disabled .mode-t,.mode:disabled .mode-b,.mode:disabled .arw{opacity:.42}
+.mode .mode-t{font-family:var(--serif);font-size:24px;font-weight:700;letter-spacing:.01em}
+.mode .mode-t .en{
+  display:block;font-family:var(--sans);font-size:10.5px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--faint);font-weight:500;margin-top:6px;
+}
+.mode .mode-b{font-size:14.5px;line-height:1.85;color:var(--ink2);max-width:36em}
+.mode .mode-b b{font-weight:700;color:var(--ink)}
+.mode .mode-b .fit{display:block;margin-top:8px;font-size:13px;color:var(--muted)}
+.mode .arw{font-size:19px;color:var(--seal);text-align:right;line-height:1.4;transition:transform .16s ease}
+.mode:hover:not(:disabled) .arw{transform:translateX(4px)}
+
+/* 步骤 */
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;padding:var(--s5) 0 var(--s6)}
+.steps div{font-size:13px;line-height:1.75;color:var(--muted)}
+.steps i{display:block;font-style:normal;font-family:var(--serif);font-size:12px;color:var(--seal);margin-bottom:6px;letter-spacing:.1em}
+.steps b{display:block;color:var(--ink);font-weight:600;margin-bottom:3px}
+
+/* 导引页（没有报告时） */
+.guide{padding:var(--s6) 0 var(--s7)}
+.guide h2{font-family:var(--serif);font-size:26px;margin:0 0 10px;letter-spacing:-.005em}
+.guide p{font-size:15px;line-height:1.9;color:var(--ink2);max-width:38em;margin:0 0 10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:36px;margin-top:var(--s4)}
+.panel{border-top:1px solid var(--rule2);padding-top:16px}
+.panel .k{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:10px}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  border:1px solid var(--rule2);border-radius:2px;padding:9px 14px;
+  font-size:13px;color:var(--ink2);background:var(--paper3);
+  transition:border-color .14s ease,color .14s ease;
+}
+.btn:hover{border-color:var(--seal);color:var(--seal)}
+.btn.primary{background:var(--seal);border-color:var(--seal);color:#FFF8F4}
+.btn.primary:hover{background:var(--seal2);border-color:var(--seal2);color:#FFF8F4}
+.btn[disabled]{opacity:.5;pointer-events:none}
+#json{width:100%;min-height:110px;margin-top:12px;padding:12px 14px;border:1px solid var(--rule2);border-radius:2px;
+  background:var(--paper3);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;line-height:1.7;color:var(--ink2);resize:vertical}
+.note{font-size:12.5px;line-height:1.8;color:var(--muted);margin-top:10px}
+.note b{color:var(--ink2)}
+.err{color:var(--bad);font-size:12.5px;margin-top:8px;min-height:18px}
+
+/* 报告 */
+.doc{padding:var(--s5) 0 var(--s7)}
+.doc .hd{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding-bottom:14px;border-bottom:1px solid var(--rule2)}
+.doc .hd .l{font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
+.doc .hd .r{font-size:11.5px;color:var(--faint);display:flex;gap:14px;align-items:center}
+.title{
+  font-family:var(--serif);font-size:clamp(28px,3.9vw,42px);font-weight:700;line-height:1.3;
+  letter-spacing:-.012em;margin:34px 0 0;
+}
+.title em{font-style:normal;color:var(--seal)}
+.title .c{margin-right:-.24em}
+.byline{
+  display:flex;flex-wrap:wrap;gap:4px 0;align-items:center;
+  margin-top:16px;font-size:12.5px;color:var(--muted);
+}
+.byline span{padding:0 12px;border-right:1px solid var(--rule2)}
+.byline span:first-child{padding-left:0}
+.byline span:last-child{border-right:0}
+.verdict{
+  margin:var(--s5) 0 0;padding:2px 0 2px 22px;border-left:2px solid var(--seal);
+  font-family:var(--serif);font-size:17.5px;line-height:1.98;color:var(--ink);
+}
+/* 病症 / 处理：左侧留一条标签槽，两段正文永远从同一列起，
+   否则第二段比第一段短的时候会看起来像没有对齐。 */
+.verdict p{margin:0;display:grid;grid-template-columns:46px minmax(0,1fr);gap:16px;align-items:start}
+/* 两段是并列的两件事，不是"标题 + 注解"，所以字号一致，
+   只靠墨色深浅分一点先后。 */
+.verdict p + p{margin-top:16px;color:var(--ink2)}
+.verdict .lb{font-family:var(--sans);font-size:11.5px;font-weight:700;letter-spacing:.22em;
+  color:var(--seal);padding-top:.62em;white-space:nowrap}
+.verdict .tx{grid-column:2}
+.verdict b{font-weight:700;background:linear-gradient(transparent 62%,var(--sealSoft) 62%)}
+
+.sec{margin-top:var(--s6);padding-top:14px;border-top:1px solid var(--rule2)}
+.sec .hd{display:flex;align-items:baseline;justify-content:space-between;gap:16px}
+.sec h2{font-family:var(--serif);font-size:23px;font-weight:700;margin:0;letter-spacing:-.005em}
+.sec h2 .no{font-family:var(--sans);font-size:11.5px;font-weight:600;color:var(--seal);letter-spacing:.1em;margin-right:12px;vertical-align:2px}
+.sec .sub{font-size:11.5px;color:var(--faint);letter-spacing:.04em}
+
+/* 批注：左正文 右页边注 */
+.row{
+  display:grid;grid-template-columns:minmax(0,1fr) 286px;gap:46px;align-items:start;
+  padding:30px 0;border-bottom:1px solid var(--rule);
+}
+.row:last-child{border-bottom:0}
+.body p{margin:0;font-family:var(--serif);font-size:18px;line-height:2.06;color:var(--ink2)}
+.body p + p{margin-top:14px}
+mark{
+  background:none;color:#6B635C;font-weight:700;font-style:italic;
+  border-bottom:1px dotted rgba(166,52,42,.55);padding:0 1px;
+}
+sup.n{
+  font-family:var(--sans);font-size:9.5px;font-weight:700;font-style:normal;
+  color:var(--seal);vertical-align:super;margin-left:1px;
+}
+.marg{font-size:12.5px;line-height:1.78;color:var(--muted)}
+.marg .pno{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin-bottom:10px}
+.marg .nt{margin-bottom:16px}
+.marg .nt:last-child{margin-bottom:0}
+.marg .nt .tag{font-weight:700;color:var(--seal);margin-right:7px}
+.marg .nt .idx{font-weight:700;color:var(--seal);margin-right:6px;font-variant-numeric:tabular-nums}
+.marg .nt p{margin:0;display:inline}
+.marg .nt .q{color:var(--faint);font-style:italic}
+
+.rw .body p{font-size:18.5px}
+.rw .marg ul{margin:0;padding:0;list-style:none}
+.rw .marg li{position:relative;padding-left:14px;margin-bottom:9px}
+.rw .marg li::before{content:"";position:absolute;left:0;top:.72em;width:6px;height:1px;background:var(--rule2)}
+.rw .marg li:last-child{margin-bottom:0}
+
+/* 列表式小节 */
+ol.plain{list-style:none;padding:0;margin:var(--s4) 0 0;counter-reset:a}
+ol.plain>li{
+  counter-increment:a;display:grid;grid-template-columns:52px minmax(0,1fr);gap:22px;
+  padding:18px 0;border-bottom:1px solid var(--rule);
+}
+ol.plain>li:last-child{border-bottom:0}
+ol.plain>li::before{
+  content:counter(a,decimal-leading-zero);font-family:var(--sans);font-size:11px;font-weight:700;
+  color:var(--seal);letter-spacing:.1em;padding-top:.5em;
+}
+.adv .t{font-family:var(--serif);font-size:18px;font-weight:700;line-height:1.6;color:var(--ink);margin-bottom:6px}
+.adv .b{font-size:15px;line-height:1.92;color:var(--ink2)}
+.how{
+  margin-top:12px;padding:10px 14px;background:var(--paper2);border-left:2px solid var(--rule2);
+  font-size:13px;line-height:1.8;color:var(--muted);
+}
+.how b{color:var(--ink2)}
+
+/* 事实表 */
+table.facts{width:100%;border-collapse:collapse;margin-top:var(--s4);font-size:14.5px}
+table.facts th{
+  text-align:left;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);
+  font-weight:600;padding:0 12px 8px 0;border-bottom:1px solid var(--rule2);
+}
+table.facts td{padding:14px 12px 14px 0;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.8}
+table.facts td.c{font-family:var(--serif);font-size:16px;color:var(--ink)}
+table.facts td.v{width:104px;white-space:nowrap;font-weight:700;font-size:13px}
+table.facts td.v.bad{color:var(--bad)}
+table.facts td.v.mid{color:var(--warn)}
+table.facts td.v.ok{color:var(--good)}
+table.facts td.b{color:var(--ink2)}
+table.facts tr:last-child td{border-bottom:0}
+
+.foot{
+  display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center;justify-content:space-between;
+  margin-top:var(--s6);padding-top:16px;border-top:1px solid var(--rule2);
+  font-size:11.5px;color:var(--faint);
+}
+.foot .acts{display:flex;gap:10px;flex-wrap:wrap}
+
+@media (max-width:860px){
+  .row{grid-template-columns:1fr;gap:18px}
+  /* 单列时页边注会落到正文下面，加一条竖线把它和正文分开，
+     否则读起来像同一段里换了个字号。 */
+  .row .marg{border-left:2px solid var(--rule2);padding-left:15px;margin-top:4px}
+  .marg .pno{margin-bottom:6px}
+  .mode{grid-template-columns:1fr 26px;gap:10px 14px}
+  .mode .mode-t{grid-column:1/-1}
+  .two{grid-template-columns:1fr;gap:24px}
+  .steps{grid-template-columns:1fr;gap:16px}
+  .cover{padding:var(--s5) 0 var(--s5)}
+  .doc{padding:var(--s4) 0 var(--s6)}
+}
+@media (max-width:560px){
+  body{font-size:15.5px}
+  .body p,.rw .body p{font-size:17px;line-height:1.98}
+  .verdict{font-size:17.5px}
+  ol.plain>li{grid-template-columns:32px minmax(0,1fr);gap:12px}
+  table.facts thead{display:none}
+  table.facts tbody tr{display:block;padding:16px 0;border-bottom:1px solid var(--rule)}
+  table.facts td{display:block;width:auto;border:0;padding:0 0 6px}
+  table.facts td.v{width:auto;padding-bottom:6px}
+  table.facts tbody tr:last-child{border-bottom:0}
+}
+@media print{
+  body{background:#fff}
+  .noprint{display:none !important}
+  .sec{break-inside:avoid}
+  .row{break-inside:avoid}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+/* ==== zh-sci-lens 引擎移植层（逐条对照 core/zh_sci_lens.py）==== */
+/* =====================================================================
+   zh-sci-lens · 引擎移植层（逐条对照 core/zh_sci_lens.py）
+   ===================================================================== */
+const SLX = (function(){
+"use strict";
+const ORIG_PARAS = ["简报思路", "目标设定——AI工具探索——AI辅助学习skill制作——在学习中优化skill——利用skill精进语言表达", "目标设定部分：", "给出常见的两种表达学术内容的例子，指出常见的学术表达容易陷入以下两个极端：", "1.伪学术（虚张声势）：堆砌大量空洞的宏观词汇或不必要的专业名词，用来掩盖逻辑漏洞。这种文本表面上“高大上”，但经不起同行评议的追问（同行一问具体机制就会露馅）。", "2.硬科普（丧失严谨）：为了让普通人听懂，把核心科学概念过度通俗化、比喻化，导致概念失真，失去了学术研究的边界条件。", "例子一：", "以图片呈现，以下是截图", "菌中的鞭毛马达是一种分子机器，它通过旋转螺旋状纤维来为像大肠杆菌这样的细菌提供动力。马达的旋转通常由离子驱动，这些离子通过电化学梯度传递，从而产生扭矩，这种效应被称为质子动力力。虽然已经有很多研究致力于理解质子转运与扭矩生成之间的关联，但仍有许多生化细节尚未明了，许多问题仍然没有答案。其中一个重要问题就是离子转运是否是协同进行的，即质子是单独移动还是成群移动。在这里，我们提出了一个简化的扭矩生成物理模型（见图 1 ），该模型不仅解释了之前的一系列实验观察结果，而且还提出了一种测量质子转运协同性的方法。具体来说，该模型预测在低负载情况下，电机的扩散过程主要由质子射击噪声驱动，而这种噪声与质子的协同作用存在强烈的二次方依赖性。", "例子二：", "今天，带你走进能让人死而复生的天体，白洞。", "白洞可以让死去的人复活，但前提是你需要在洞口等待100亿年，甚至一直等到宇宙彻底终结。因为白洞就是时间倒着流的黑洞，任何掉进黑洞的东西，理论上都会从白洞里原封不动地吐出来。逝去的亲人，消失的文明，甚至恐龙，全在里面排队。更疯狂的是，从白洞的视角看，他们从没死过，只是被困在了时间的另一面。", "这不是科幻，而是爱因斯坦相对论亲手写下的宇宙法则。1916年一战战场上，一名发着高烧、濒临死亡的德国士兵，在炮火间隙解出了广义相对论史上第一个完整答案，他叫施瓦西。他不仅算出了黑洞，更在方程里发现了一个恐怖的对称体——时间反向流动的天体。只要方程允许黑洞存在，白洞就必须存在，就像有光就必有影，有正面就必有反面。", "1964年，苏联物理学家诺维科夫用严密计算再次确认，白洞不是幻想，而是数学上无法抹杀的真实。可人类找了它整整一百年，却连一丝影子都没看见。不是它藏得深，而是它一出现就会杀死自己。白洞疯狂向外喷射物质，可这些物质会在引力作用下瞬间坍缩在白洞外层，直接裹成一个黑洞。从外面看，它和普通黑洞一模一样。你以为它在吞噬，其实它在拼命释放。", "更绝望的是，白洞触犯了宇宙最不能碰的铁律——热力学第二定律。宇宙只允许混乱越来越多，不允许破碎自动复原。黑洞是乖乖听话的宇宙清道夫，把有序变成混乱；而白洞是逆天而行的叛逆者，把混乱强行拼回有序。它在逆转时间，反抗熵增，改写宇宙底层规则。这也是为什么主流物理学界一度认为，白洞根本不被允许存在。", "但宇宙远比人类疯狂。2006年，NASA卫星捕捉到一场颠覆所有认知的宇宙爆炸，编号GRB 060614。普通伽马射线爆只持续几秒，而它足足燃烧了102秒。最诡异的是，爆炸中心空无一物，没有超新星，没有中子星，没有黑洞，什么都没有。就像虚空突然裂开，喷涌出滔天能量，又瞬间闭合消失。科学家终于意识到，这不是普通爆炸，这是白洞一闪而逝的尸体。", "真正颠覆世界观的是宇宙起源的终极秘密。越来越多顶尖物理学家相信，我们的宇宙大爆炸本身就是一场白洞爆发。在我们的宇宙之前，还存在过一个更古老的宇宙，它不断坍缩、压缩，最终在极限密度下反弹，黑洞瞬间变成白洞。那一场惊天喷发，就是我们宇宙的诞生。你身上的每一个原子，每一丝能量，都来自上一个宇宙的残骸。我们都是从前世宇宙的黑洞里掉进去，被现在的宇宙白洞吐出来的人。黑洞吞噬死亡，白洞创造新生，宇宙就在一吸一吐之间永恒循环。", "但最恐怖的真相来了：白洞的复活从来不是救赎，而是最残酷的惩罚。根据相对论，掉进黑洞的0.1秒，等于外界的1000亿年。当你从白洞被吐出来时，太阳早已熄灭，银河系早已粉碎，你爱的人，你的故乡，你的文明，连一粒灰尘都不会剩下。你确实复活了，却成了全宇宙最孤独的幽灵。", "更让人脊背发凉的是，穿越黑洞与白洞的过程中，你的身体会被引力撕成粒子，再被强行重组。你的记忆、情感、意识还能剩下多少？从白洞里走出来的，真的还是你认识的那个人吗？还是一个被千亿年孤独彻底摧毁的陌生怪物？白洞能复活肉体，却救不回灵魂。", "直到今天，白洞依然是宇宙最大的谜。它可能藏在每一次神秘爆炸里，可能藏在宇宙诞生的起点，可能藏在每一个黑洞的终点，也可能它只是数学上一场美丽却无法实现的梦。但它带给我们的从来不是永生的希望，而是一句最清醒的提醒：与其等待百亿年后一场虚无缥缈的复活，不如珍惜此刻你能拥抱、能看见、能陪伴的每一秒。在这个浩瀚又冷漠的宇宙里，唯一真正珍贵、永远不可逆的，从来不是重生，而是你正在拥有的现在。", "弱项诊断", "1.“伪学术”倾向（虚张声势、拒绝说人话）", "具体表现：堆砌空洞的宏观词汇（如“全方位赋能、多维度体系化推进”）或冗长的嵌套定语，用假大空的排比掩盖实质逻辑的苍白。", "2.“硬科普”倾向（过度通俗、概念严重失真）", "具体表现：为了让普通人秒懂，生硬使用大众化比喻（如把复杂的物理场或神经机制比作“吸尘器”或“开关”），彻底剥离了科学研究赖以成立的边界条件、概率区间与限定前提。", "工具探索", "1.使用Gemini、deepseek等工具后发现现有的chatbot工具存在不足，不足根据实际展示的案例决定", "2.选择使用Agent工具，人与Agent在协同中共同进步：人向agent询问修改办法，对agent的修改进行学习和反馈；agent根据人类的反馈优化语言表达的内容，进一步将严谨易懂的学术表达规则形成一个skill。", "人机协作的反思", "AI 扮演的角色：", "诊段期：文本审计员（定位冗余）。", "执行期：脚手架搭建者（提供同义重构视角）。", "复盘期：对立审稿人（测试边界条件）。", "提示词（Prompt）迭代体会：", "从单一指令（“帮我改精简”）升级为 结构化双重约束 Prompt（指定目标受众、保留术语底线、控制句子长度）。", "AI 的优点与局限：", "优点：极高的高频词汇替换效率与句式重构灵活性。", "局限：缺乏对特定前沿学科微观机制的真实物理理解，仍需人工进行严谨性终审", "学习成果展示", "成果矩阵对照表（文本“瘦身与重构”前后对比）：", "示例展示：展现一段高密度学术段落修改前后的对比（从 180 字压缩至 95 字，信息量零损失，阅读难度下降 50%）。", "应用场景拓宽： 展示该skill在学术口头汇报讲稿、论文 Abstract 撰写以及跨学科交流中的实际提升效果，指出该skill可以辅助他人学习学术表达的亲社会价值和不同学术场景的兼容性"];
+
+// ---------- 词表（与 Python 逐条一致） ----------
+const AI_WORDS = ['赋能','闭环','抓手','底层逻辑','顶层设计','方法论','维度','体系化',
+  '深度融合','全面升级','显著提升','有效提升','持续赋能','多维度','值得注意的是',
+  '综上所述','总而言之','毋庸置疑','不可否认','在当今','值得关注的是','不难发现','由此可见'];
+const NUMBERED = ['首先','其次','再次','其一','其二','其三'];
+const NUMBERED_LINE = /^\s*[（(]?[0-9一二三四五六七八九十]{1,2}[)）.．、]\s*\S/;
+const READABLE = ['比如','例如','想象','假如','你可以','我们看到','注意','问题是','关键在于',
+  '奇怪的是','有意思的是','反过来','先说','再看','回到'];
+const FOLLOW = ['也就是说','换句话说','简单说','具体来说','这就意味着','所以','因此','但是','不过','其实'];
+const QUALIFIER = ['条件下','假设','近似','范围内','目前','理论上','可能','尚未','不确定','取决于','在模型','量级'];
+const FILLER_ADV = ['深入地','切实地','有效地','全面地','系统性地','持续地','进一步地','大力','高度重视','充分','积极'];
+const HEDGE = ['某种程度','一定程度上','可以说','应该说','相对而言','总体而言'];
+const CONNECTIVES = ['但是','不过','其实','换句话说','也就是说','例如','比如','注意','这是因为',
+  '所以','因此','反而','只要','问题是','也就是说','简单说','具体来说'];
+const DEF_PATTERNS = [/^所谓/,/指的是/,/定义为/,/是指/,/^.{2,10}是[^，。]{2,20}的一种$/,/称为/,/即为/,/可表述为/];
+const QUANT_RE = /(\d+(?:\.\d+)?)\s*(亿年|万年|年|秒|分钟|小时|公里|千米|米|摄氏度|℃|%|倍|个|次|光年|吨|千克)/g;
+const SENSATIONAL = ['震惊','颠覆','疯狂','绝望','恐怖','脊背发凉','最恐怖','不敢相信','终于',
+  '真相来了','铁律','逆天','摧毁','幽灵'];
+const ABSOLUTE = ['一定','必然','绝对','从不','永远','所有','任何','完全','毫无疑问','证明','证实了'];
+
+// ---------- 基础 ----------
+// 与 Python re.sub(r'\s', '') 一致：JS 的 \s 包含 U+FEFF，Python 的 \s 不包含。
+// 不减掉这一个字，含 'AI 扮演的角色：' 一类段落的 _len 会多算 1，跨过 >2 阈值被误切。
+const _len = s => s.replace(/[\s\uFEFF]/g,'').length;
+const count = (t,list) => list.reduce((n,w)=> n + (t.split(w).length-1), 0);
+const _grad = (x,lo,hi) => hi<=lo ? (x>=hi?1:0) : Math.max(0,Math.min(1,(x-lo)/(hi-lo)));
+function _cv(xs){
+  if (xs.length < 2) return 0.0;
+  const m = xs.reduce((a,b)=>a+b,0)/xs.length;
+  if (m === 0) return 0.0;
+  const v = xs.reduce((a,b)=>a+(b-m)**2,0)/xs.length;
+  return Math.round(Math.sqrt(v)/m*100)/100;
+}
+
+// ---------- 句子切分（对应 split_sentences） ----------
+const CJKRE = /[\u4e00-\u9fff]/, ENRE = /[A-Za-z0-9]/;
+function split_sentences(text){
+  // 直接移植 Python split_sentences：三层切分 + 末尾过滤，不借用任何共享状态
+  text = String(text||'').trim();
+  if (!text) return [];
+
+  // Python：str 即码点序列；这里用 Array.from 保证与 len() 同口径
+  const chars = s => Array.from(s);
+  const isCJK = ch => ch >= '\u4e00' && ch <= '\u9fff';
+  const isEN  = ch => (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9');
+  // Python 的 re.sub(r'\s','') 只剔 ASCII 空白，不含 U+FEFF
+  const plen = s => chars(s).filter(ch => !/[ \t\n\r\f\v]/.test(ch)).length;
+
+  const raw = [];
+  for (const blk0 of text.split(/\n+/)){
+    const blk = blk0.trim();
+    if (!blk) continue;
+    // L1：中文句末
+    const cn = [];
+    let cur = '';
+    for (const ch of chars(blk)){
+      cur += ch;
+      if (ch === '。' || ch === '！' || ch === '？' || ch === '；'){ cn.push(cur); cur = ''; }
+    }
+    if (cur) cn.push(cur);
+    // L2：英文句末 + 后随空白
+    for (const piece of cn){
+      const arr = chars(piece);
+      let c = '';
+      for (let i = 0; i < arr.length; i++){
+        c += arr[i];
+        if ((arr[i] === '.' || arr[i] === '!' || arr[i] === '?')
+            && i + 1 < arr.length && /\s/.test(arr[i+1])){
+          raw.push(c); c = '';
+        }
+      }
+      if (c) raw.push(c);
+    }
+  }
+
+  // L3：脚本边界（CJK ⇄ Latin），cur 长度按 Python 口径 > 2 才切
+  const sents = [];
+  for (const piece of raw){
+    const arr = chars(piece);
+    // 先按 Python 的 strip() 去掉首尾空白，再逐码点扫描
+    let lo = 0, hi = arr.length;
+    while (lo < hi && /\s/.test(arr[lo])) lo++;
+    while (hi > lo && /\s/.test(arr[hi-1])) hi--;
+    let cur = '', prev = null;
+    for (let i = lo; i < hi; i++){
+      const ch = arr[i];
+      const kind = isCJK(ch) ? 'cn' : (isEN(ch) ? 'en' : null);
+      if (kind === null){ cur += ch; continue; }
+      // Python: len(cur) > 2 —— cur 含标点与空白，不剔除空白
+      if (prev !== null && kind !== prev && Array.from(cur).length > 2){ sents.push(cur); cur = ''; }
+      cur += ch;
+      prev = kind;
+    }
+    if (cur) sents.push(cur);
+  }
+  // 末尾过滤：去首尾空白后长度 > 1
+  return sents.map(s => s.trim()).filter(s => plen(s) > 1);
+}
+
+// ---------- 破折号（对应 dashes） ----------
+function dashes(text){
+  let n = 0;
+  for (const line of text.split('\n')){
+    const segs = line.split('——');
+    if (segs.length >= 3 && segs.every(x => _len(x) <= 14)) continue;
+    n += segs.length - 1;
+  }
+  for (const line of text.split('\n')){
+    if (line.includes('——')) continue;
+    n += (line.split('—').length - 1);
+  }
+  return n;
+}
+
+// ---------- 定量断言（对应 quant_claims） ----------
+function quant_claims(text){
+  const out = []; let m;
+  const re = new RegExp(QUANT_RE.source, 'g');
+  while ((m = re.exec(text)) !== null){
+    out.push({value: m[1]+m[2],
+      ctx: text.slice(Math.max(0,m.index-18), m.index+m[0].length+18)});
+  }
+  return out;
+}
+
+// ---------- 段落指标（对应 paragraph_metrics） ----------
+function paragraph_metrics(p){
+  const sents = split_sentences(p);
+  const lens = sents.map(_len);
+  return {
+    chars: _len(p), sents: sents.length, lens: lens,
+    cv: lens.length ? _cv(lens) : 0.0,
+    max_len: lens.length ? Math.max(...lens) : 0,
+    ai: count(p, AI_WORDS),
+    dash: dashes(p),
+    numbered: count(p, NUMBERED) + (NUMBERED_LINE.test(p) ? 1 : 0),
+    filler: count(p, FILLER_ADV),
+    conn: count(p, CONNECTIVES),
+    defs: DEF_PATTERNS.reduce((n,re)=> n + ((p.match(new RegExp(re.source,'gm'))||[]).length), 0),
+    quote: (p.split('“').length-1) + (p.split('《').length-1),
+    sensational: count(p, SENSATIONAL),
+    absolute: count(p, ABSOLUTE),
+    quant: quant_claims(p).length,
+    readable: count(p, READABLE),
+    follow: count(p, FOLLOW),
+    qualifier: count(p, QUALIFIER),
+    dialogue: (p.split('你').length-1) + (p.split('我们').length-1),
+  };
+}
+
+// ---------- 全文分析（对应 analyze） ----------
+function analyze(text, mode){
+  mode = mode || 'auto';
+  const paras = text.split(/\n+/).map(s=>s.trim()).filter(Boolean);
+  const pm = paras.map(paragraph_metrics);
+  const lens_all = pm.flatMap(m=>m.lens);
+  const total_chars = pm.reduce((a,m)=>a+m.chars,0) || 1;
+  const k = x => Math.round(x*1000.0/total_chars*10)/10;
+  const agg = {
+    paras: paras.length, chars: total_chars,
+    sents: pm.reduce((a,m)=>a+m.sents,0),
+    mean_len: lens_all.length ? Math.round(lens_all.reduce((a,b)=>a+b,0)/lens_all.length*10)/10 : 0,
+    sd_len: _cv(lens_all),
+    max_len: lens_all.length ? Math.max(...lens_all) : 0,
+    ai_per_k: k(pm.reduce((a,m)=>a+m.ai,0)),
+    dash_per_k: k(pm.reduce((a,m)=>a+m.dash,0)),
+    conn_per_k: k(pm.reduce((a,m)=>a+m.conn,0)),
+    filler_per_k: k(pm.reduce((a,m)=>a+m.filler,0)),
+    numbered_per_k: k(pm.reduce((a,m)=>a+m.numbered,0)),
+    defs: pm.reduce((a,m)=>a+m.defs,0),
+    sensational_per_k: k(pm.reduce((a,m)=>a+m.sensational,0)),
+    absolute_per_k: k(pm.reduce((a,m)=>a+m.absolute,0)),
+    term_per_k: null,
+    quant_claims: paras.flatMap(quant_claims),
+    readable_per_k: k(pm.reduce((a,m)=>a+m.readable,0)),
+    follow_per_k: k(pm.reduce((a,m)=>a+m.follow,0)),
+    qualifier_per_k: k(pm.reduce((a,m)=>a+m.qualifier,0)),
+    dialogue_per_k: k(pm.reduce((a,m)=>a+m.dialogue,0)),
+  };
+  // ---- 趣味性：四种可数结构
+  let hooks = 0;
+  for (const p of paras){
+    const ss = split_sentences(p);
+    if (ss.length >= 2 && _len(ss[ss.length-1]) <= 18) hooks += 1;
+  }
+  const qmark = paras.reduce((a,p)=> a + (p.split('？').length-1) + (p.split('?').length-1), 0);
+  let anchors = 0;
+  for (const p of paras){
+    anchors += (p.match(/\d{2,4}年|\d+(?:\.\d+)?\s*[百千万亿]*\s*(?:年|秒|米|倍|%|天|万光年)/g)||[]).length;
+    anchors += (p.match(/[A-Z]{2,}[\s\d]{0,8}\d*/g)||[]).length;
+    anchors += (p.split('“').length-1);
+  }
+  const dialogue = paras.reduce((a,p)=> a + (p.split('你').length-1), 0);
+  const hook_per_para = hooks / Math.max(paras.length,1);
+  const qmark_per_k = qmark*1000.0/total_chars;
+  const anchor_per_k = anchors*1000.0/total_chars;
+  let fun = 25.0 * _grad(hook_per_para, 0.05, 0.35);
+  fun += 20.0 * _grad(qmark_per_k, 0.5, 4.0);
+  fun += 30.0 * _grad(anchor_per_k, 2.0, 15.0);
+  fun += 25.0 * _grad(dialogue*1000.0/total_chars, 2.0, 20.0);
+  fun -= Math.min(agg.sensational_per_k, 15)/15 * 25;
+  agg.hook_per_para = Math.round(hook_per_para*100)/100;
+  agg.qmark_per_k = Math.round(qmark_per_k*100)/100;
+  agg.anchor_per_k = Math.round(anchor_per_k*10)/10;
+  agg.dialogue_per_k = Math.round(dialogue*1000.0/total_chars*10)/10;
+
+  let read = Math.min(agg.follow_per_k + agg.conn_per_k, 12)/12*35;
+  read += Math.max(0, 55-agg.mean_len)/55*35;
+  read += Math.min(Math.max(0, agg.sd_len-0.12)/0.40, 1.0)*20;
+  read += Math.min(hook_per_para, 0.5)/0.5*10;
+  agg.fun_score = Math.round(Math.max(0, Math.min(100, fun)));
+  agg.read_score = Math.round(Math.max(0, Math.min(100, read)));
+  agg.assert_strength = Math.round(Math.max(0, agg.absolute_per_k*3 + agg.sensational_per_k*2
+    - agg.qualifier_per_k*0.4)*10)/10;
+
+  // ---- 模式判定
+  let hard = 0, shallow = 0;
+  hard += Math.max(0, (agg.mean_len-45))/45*40;
+  hard += Math.max(0, (0.20-agg.sd_len))/0.20*25;
+  hard += Math.max(0, (agg.defs-2))/10*15;
+  hard += (agg.conn_per_k < 5 ? 1 : 0)*10;
+  shallow += Math.max(0, (agg.sensational_per_k-3))/15*40;
+  shallow += Math.max(0, (agg.absolute_per_k-2))/10*20;
+  shallow += Math.max(0, agg.dash_per_k-1.5)/5*15;
+  shallow += Math.max(0, (agg.mean_len-40))*0.3;
+  shallow += Math.min(agg.quant_claims.length,10)*1.5;
+  if (mode === 'auto') mode = (hard >= shallow) ? 'pop' : 'rig';
+
+  const signals = [];
+  if (agg.mean_len > 45) signals.push(`平均句长 ${agg.mean_len} 字 > 45：长句连缀，读者要一口气承担多个动作`);
+  if (agg.sd_len < 0.20) signals.push(`句长变异 ${agg.sd_len} < 0.20：全篇句长几乎一样，没有短句给读者换气`);
+  if (agg.conn_per_k < 5) signals.push(`连接词密度 ${agg.conn_per_k}/千字 < 5：推论关系没有说出来，靠读者自己补`);
+  if (agg.defs > 2 && mode === 'pop') signals.push(`定义式句型 ${agg.defs} 处：教材腔，先给定义再给动机`);
+  if (agg.sensational_per_k > 3) signals.push(`情绪词密度 ${agg.sensational_per_k}/千字：论证被情绪替代`);
+  if (agg.absolute_per_k > 2) signals.push(`绝对化断言 ${agg.absolute_per_k}/千字：缺少限定条件`);
+  if (agg.quant_claims.length) signals.push(`可核验定量断言 ${agg.quant_claims.length} 处：模式 B 必须逐条核对文献`);
+  return {mode, score_hard: Math.round(hard), score_shallow: Math.round(shallow), agg, signals, per_para: pm};
+}
+
+// ---------- 控件（对应 c_*） ----------
+function c_dash(text){
+  return text.split('\n').map(line=>{
+    const segs = line.split('——');
+    if (segs.length >= 3 && segs.every(x=>_len(x) <= 14)) return line;
+    if (!line.includes('——') && !line.includes('—')) return line;
+    // 成对破折号夹的是一句解释语：改成「：…，」最贴合中文习惯。
+    let l = line.replace(/——([^。！？\n]{0,40}?)——/g, '：$1，');
+    // 剩下单个破折号要看右边是什么：短名词（≤20 字）是同位语，用逗号接；
+    // 长从句才断成句号。一律断句会把「铁律——热力学第二定律」切成两个碎句。
+    const parts = l.split('——');
+    if (parts.length > 1){
+      let out = parts[0];
+      for (let i = 1; i < parts.length; i += 1){
+        const head = (parts[i].split(/[，。！？；]/)[0] || '');
+        out += (_len(head) <= 20 ? '，' : '。') + parts[i];
+      }
+      l = out;
+    }
+    // 单个 em dash：dashes() 同样计入，不清掉就永远过不了闸门。
+    if (l.includes('—')) l = l.split('—').join('，');
+    return l.replace(/，\s*，/g, '，');
+  }).join('\n');
+}
+function c_ai(text){
+  const rep = {'赋能':'提供支持','闭环':'完整流程','抓手':'着手的地方','底层逻辑':'基本道理',
+    '顶层设计':'整体安排','方法论':'方法','体系化':'成体系','深度融合':'结合得更紧',
+    '显著提升':'明显提高','值得注意的是':'需要注意的是','综上所述':'总的来说',
+    '毋庸置疑':'可以确定','由此可见':'于是可以看出'};
+  for (const [a,b] of Object.entries(rep)) text = text.split(a).join(b);
+  return text;
+}
+function c_numbered(text){
+  for (const w of ['首先，','其次，','再次，','最后，']) text = text.split(w).join('');
+  return text;
+}
+function c_filler(text){
+  for (const w of FILLER_ADV) text = text.split(w).join('');
+  return text.replace(/，\s*，/g, '，');
+}
+function c_hedge(text){
+  for (const w of HEDGE) text = text.split(w).join('');
+  return text;
+}
+function c_universal(text){
+  // 逐条带上下文，不能一律替换：
+  // 「必然的结论」是形容词位，换成「在这些前提下会」会写出病句；
+  // 「绝对值 / 绝对零度」是术语，「一定量 / 一定程度」是数量词，都不能动。
+  let t = text.replace(/必然的/g, '在这些前提下成立的');
+  t = t.replace(/必然(?!的)/g, '在这些前提下');
+  t = t.replace(/绝对(?!值|零)/g, '在实验范围内');
+  t = t.replace(/一定(?=会|能|要|是|将|得)/g, '在有这些条件时');
+  t = t.replace(/从不/g, '目前没有观察到');
+  t = t.replace(/永远/g, '至今');
+  t = t.replace(/完全/g, '基本');
+  // 数学里的「证明」常是名词（证明过程），只动动词形。
+  t = t.replace(/证明了/g, '支持了');
+  t = t.replace(/证实了/g, '与该说法一致');
+  return t;
+}
+
+// [显示名, 可执行函数(null=需模型), 预估增益, 一句描述]
+const CONTROLS = {
+  unv:['绝对化改有条件', c_universal, 18, '「必然 / 所有」改成带条件的陈述'],
+  mon:['降低术语密度', null, 15, '术语先解释再用，或换掉不必要的行话'],
+  sub:['恢复主语', null, 12, '把无主句补回是谁在做这件事'],
+  cf:['拆分长句', c_dash, 14, '一句话只留一个转折，破折号改逗号或断句'],
+  ai:['清除AI词', c_ai, 10, '赋能 / 闭环 / 综上所述 一类模板词'],
+  num:['打散编号腔', c_numbered, 8, '行首的 1. 2. 3. 改成自然过渡'],
+  fil:['删冗余状语', c_filler, 6, '深入地 / 切实地 / 有效地 这类空状语'],
+  hed:['去对冲话术', c_hedge, 6, '某种程度上 / 可以说 这类不承担信息的话'],
+  met:['加可核验细节', null, 20, '给年份、数字、专名，让抽象句落地'],
+  ana:['加类比', null, 22, '用日常经验搭桥，必须附「它在哪不成立」'],
+  dlg:['加对话感', null, 25, '第二人称、直接提问，趣味分权重最大的一项'],
+  qst:['定义句改提问', null, 18, '「X 是 Y」改成「那 X 到底是什么？」'],
+  hok:['加悬念钩子', null, 16, '段末压一句短句，制造读下去的拉力'],
+  anc:['加具体锚点', null, 14, '具体的人、时间、地点、数字，替掉泛指'],
+};
+const ENGINE_OK = Object.keys(CONTROLS).filter(k => CONTROLS[k][1]);
+
+function apply_controls(text, names){
+  const log = [];
+  for (const n of names){
+    const fn = (CONTROLS[n]||[null,null])[1];
+    if (!fn){ log.push(`${n}: 需 LLM 执行`); continue; }
+    const before = text;
+    text = fn(text);
+    if (text !== before) log.push(`${n}: 已改`);
+  }
+  return {text, log};
+}
+
+const GATE = {tell_max:15, dash_max:0, parallel_max:1, para_cv_min:0.20,
+              mean_len_max:45, ai_per_k_max:2.0, conn_per_k_min:5.0};
+function check_gates(text){
+  const a = analyze(text), g = [];
+  if (a.agg.dash_per_k * a.agg.chars / 1000 > GATE.dash_max)
+    g.push(['dash', `破折号 ${a.agg.dash_per_k}/千字 未清零`]);
+  if (a.agg.mean_len > GATE.mean_len_max)
+    g.push(['len', `平均句长 ${a.agg.mean_len} > ${GATE.mean_len_max}`]);
+  if (a.agg.sd_len < GATE.para_cv_min)
+    g.push(['cv', `句长变异 ${a.agg.sd_len} < ${GATE.para_cv_min}`]);
+  if (a.agg.ai_per_k > GATE.ai_per_k_max)
+    g.push(['ai', `AI 词 ${a.agg.ai_per_k}/千字 > ${GATE.ai_per_k_max}`]);
+  return {pass: g.length===0, fail: g, agg: a.agg};
+}
+
+return {ORIG_PARAS: ORIG_PARAS, AI_WORDS, CONTROLS, ENGINE_OK, GATE, split_sentences, paragraph_metrics,
+        analyze, apply_controls, check_gates, dashes, quant_claims, _len, _cv};
+})();
+window.SLX = SLX;
+</script>
+
+<script>
+/* ============================================================
+   双镜批注本 · 独立版
+   零依赖、无网络请求：引擎在本地算指标，报告由模型写好后注入
+   （window.REPORT）或由你粘贴进来。
+   ============================================================ */
+(function () {
+  'use strict';
+
+  /* ---------- 小工具 ---------- */
+  const $ = (s, r) => (r || document).querySelector(s);
+  const esc = (s) =>
+    String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  const nfmt = (n) => Number(n).toLocaleString('en-US');
+  const cls = (ok) => (ok ? 'ok' : 'no');
+
+  const TH = { read: 60, fun: 50, assert: 8 };
+
+  /* ---------- 状态 ---------- */
+  const S = { screen: 'cover', mode: 'rig', text: '', metrics: null, data: null, err: '' };
+
+  /* ---------- 测量 ---------- */
+  function measure(text) {
+    if (!text || !text.trim()) return null;
+    try {
+      const a = SLX.analyze(text);
+      return {
+        mode: a.mode,
+        hard: a.score_hard,
+        shallow: a.score_shallow,
+        agg: a.agg,
+        paras: (a.per_para || []).length,
+      };
+    } catch (e) {
+      return null;
+    }
+  }
+
+  const paragraphs = (text) =>
+    String(text || '').replace(/\r/g, '').split(/\n+/).map((s) => s.trim()).filter(Boolean);
+
+  /* ---------- 报告取数 ---------- */
+  function normalize(obj) {
+    if (!obj || typeof obj !== 'object') return null;
+    const rep = obj.report || (obj.title || obj.annots ? obj : null);
+    if (!rep) return null;
+    const text = obj.text || S.text || '';
+    return {
+      mode: obj.mode || rep.mode || S.mode,
+      text,
+      metrics: obj.metrics || measure(text),
+      report: rep,
+    };
+  }
+
+  /* ---------- 标注 ---------- */
+  function segments(p, notes) {
+    const items = (notes || [])
+      .map((n) => ({ n: n.n, q: String(n.quote || '') }))
+      .filter((x) => x.q)
+      .sort((a, b) => b.q.length - a.q.length);
+    let rest = [{ text: p }];
+    const done = [];
+    for (const it of items) {
+      const next = [];
+      for (const seg of rest) {
+        if (seg.n != null) { next.push(seg); continue; }
+        let from = 0;
+        let hit = seg.text.indexOf(it.q, from);
+        if (hit < 0) { next.push(seg); continue; }
+        if (hit > 0) next.push({ text: seg.text.slice(0, hit) });
+        next.push({ n: it.n, text: it.q });
+        const tail = seg.text.slice(hit + it.q.length);
+        if (tail) next.push({ text: tail });
+      }
+      rest = next;
+    }
+    return rest.concat(done);
+  }
+
+  function marked(p, notes) {
+    return segments(p, notes)
+      .map((s) => (s.n == null ? esc(s.text) : '<mark>' + esc(s.text) + '</mark><sup class="n">' + s.n + '</sup>'))
+      .join('');
+  }
+
+  /* ---------- 封面 ---------- */
+  function coverHTML() {
+    return (
+      '<div class="wrap">' +
+        '<div class="mast"><span class="l">双镜批注本</span>' +
+          '<span class="r">Dual-Lens · <b>中文表达双镜片</b></span></div>' +
+        '<section class="cover">' +
+          '<div class="eyebrow">Annotated Edition</div>' +
+          '<h1>这段文字，<em>你要哪一种改法</em>？</h1>' +
+          '<p class="standfirst">一次只出一种稿。要么把话压回它证据能撑住的位置，要么把埋在句子后半截的机制挖到前面。<b>同一个问题，两种相反的修法。</b></p>' +
+          '<div class="field">' +
+            '<div class="lab"><span>要处理的文本</span><span id="cnt">0 字</span></div>' +
+            '<textarea id="src" placeholder="把一段中文放进来。空行分段 —— 报告按段落批注。&#10;&#10;几段到十几段最合适。"></textarea>' +
+          '</div>' +
+          '<div class="meter" id="meter"><span class="none">引擎在本地算，不上传。</span></div>' +
+          '<div class="pick"><div class="hd">两种改法，选一种</div>' +
+            '<button class="mode" data-mode="rig" disabled>' +
+              '<span class="mode-t">严谨化<span class="en">Tighten</span></span>' +
+              '<span class="mode-b">把断言压回它证据能支撑的位置：该加条件的加条件，该降级的降级，该删的删。<b>不改知识，只改确定性。</b><span class="fit">适合：说得太满、把「理论上可能」写成「已经发生」的文字。</span></span>' +
+              '<span class="arw">→</span>' +
+            '</button>' +
+            '<button class="mode" data-mode="pop" disabled>' +
+              '<span class="mode-t">通俗化<span class="en">Plain</span></span>' +
+              '<span class="mode-b">删掉重复，把机制提到前面，把解释从句尾拖出来放开头。<b>不降密度，只做减法。</b><span class="fit">适合：准确但读不下去、每段都在堆情绪的文字。</span></span>' +
+              '<span class="arw">→</span>' +
+            '</button>' +
+          '</div>' +
+          '<div class="steps">' +
+            '<div><i>01</i><b>贴文本</b>引擎当场给出可读分、趣味分与断言强度，并判断这段更像「太难懂」还是「不严谨」。</div>' +
+            '<div><i>02</i><b>选一种</b>只出一种稿，不跑两遍 —— 两种都做是两倍时间，而你通常只要一份。</div>' +
+            '<div><i>03</i><b>拿报告</b>批注、改写、总结、事实核对、建议，一整份；可导出 HTML / Markdown。</div>' +
+          '</div>' +
+        '</section>' +
+      '</div>'
+    );
+  }
+
+  /* ---------- 导引（报告还没到手） ---------- */
+  function guideHTML() {
+    const m = S.metrics;
+    const name = S.mode === 'rig' ? '严谨化' : '通俗化';
+    return (
+      '<div class="wrap">' +
+        '<div class="mast"><span class="l">双镜批注本</span><span class="r">' + name + ' · ' + nfmt(m ? m.agg.chars : 0) + ' 字</span></div>' +
+        '<section class="guide">' +
+          '<h2>报告由模型写，这份页面负责把它排成一本册子</h2>' +
+          '<p>页面本身不联网。把下面的任务包交给任意一个 agent（DeepSeek、WorkBuddy、Codex 都行），它返回一段 JSON；粘回右边，报告就出来了。</p>' +
+          '<div class="two">' +
+            '<div class="panel">' +
+              '<div class="k">① 复制任务包</div>' +
+              '<button class="btn primary" id="copyPrompt">复制给 agent 的完整指令</button>' +
+              '<p class="note">指令里已经带上原文、引擎实测值、输出契约与示例。<b>改法：' + name + '</b>。粘贴过去直接发送即可。</p>' +
+              '<div class="err" id="copyMsg"></div>' +
+            '</div>' +
+            '<div class="panel">' +
+              '<div class="k">② 把 agent 的 JSON 粘回来</div>' +
+              '<textarea id="json" placeholder=\'{"mode":"' + S.mode + '","report":{"title":"…","verdict":["…"],"annots":[…]}}\'></textarea>' +
+              '<div style="margin-top:12px"><button class="btn" id="loadJson">渲染报告</button>' +
+              '<button class="btn" id="back" style="margin-left:8px">换一篇</button></div>' +
+              '<div class="err" id="loadMsg"></div>' +
+            '</div>' +
+          '</div>' +
+        '</section>' +
+      '</div>'
+    );
+  }
+
+  /* ---------- 报告 ---------- */
+  function titleHTML(rep) {
+    const full = String(rep.title || '未命名');
+    const accent = String(rep.titleAccent || '');
+    let head = full;
+    let acc = '';
+    if (accent && full.endsWith(accent) && full.length > accent.length) {
+      head = full.slice(0, -accent.length);
+      acc = accent;
+    }
+    head = head.replace(/：$/, '<span class="c">：</span>');
+    return '<h1 class="title">' + head + (acc ? '<em>' + esc(acc) + '</em>' : '') + '</h1>';
+  }
+
+  function bylineHTML(rep) {
+    const list = (Array.isArray(rep.byline) ? rep.byline : []).slice(0, 5);
+    if (!list.length) return '';
+    return '<div class="byline">' + list.map((b) => '<span>' + esc(b) + '</span>').join('') + '</div>';
+  }
+
+  /* annots[].i 有两种写法：0 基（等于段落下标）和 1 基。有 i=0 就按 0 基读，
+     否则按 1 基读——两种都能渲染，不要求写报告的人猜我是怎么想的。 */
+  function notesByPara(annots, paras) {
+    const list = Array.isArray(annots) ? annots : [];
+    const zero = list.some((a) => Number(a && a.i) === 0);
+    const m = new Map();
+    list.forEach((a) => {
+      const raw = Number(a && a.i);
+      if (!Number.isFinite(raw)) return;
+      const idx = zero ? raw : raw - 1;
+      if (idx < 0 || idx >= paras) return;
+      m.set(idx, (a && a.notes) || []);
+    });
+    return m;
+  }
+
+  /* note.tag 白名单（与插件 lib/host/polish.js 一致）。模型自创的标签在这里
+     落到最近的一个，保证两版看到的标签是同一套词。 */
+  const TAGS = ['太大', '没证据', '说法偏了', '说不通', '看不懂', '可以删', '数字虚', '换个说法'];
+  const TAG_HINTS = [
+    [/最|极|巨大|程度|过度|夸张|失据|撑大/, '太大'],
+    [/归因|因果|证据|未名|来源|出处|标准/, '没证据'],
+    [/偏|错|不准|误|过强|过早|反转|说反/, '说法偏了'],
+    [/跳脱|接不上|不连贯|断裂|逻辑/, '说不通'],
+    [/术语|难懂|抽象|名词化|拥挤|密度/, '看不懂'],
+    [/冗余|可删|重复|凑数/, '可以删'],
+    [/数字|量级|参照|单位/, '数字虚'],
+    [/公文|腔|生硬|书面/, '换个说法'],
+  ];
+  function fixTag(tag) {
+    const t = String(tag || '').trim();
+    if (!t) return '换个说法';
+    if (TAGS.indexOf(t) >= 0) return t;
+    for (let i = 0; i < TAG_HINTS.length; i += 1) if (TAG_HINTS[i][0].test(t)) return TAG_HINTS[i][1];
+    return '换个说法';
+  }
+
+  /* 模型有时会自己写「病症：」「处理：」开头，标签由页面给，这里剥掉避免重复。 */
+  const VLAB = '病症诊断|病症|诊断|问题|处理办法|处理|改法|怎么改';
+  const RE_BR = new RegExp('^\\s*【\\s*(?:' + VLAB + ')\\s*】\\s*');
+  const RE_CL = new RegExp('^\\s*(?:' + VLAB + ')\\s*[：:]\\s*');
+  /* 模型爱自己加"【病症】""处理："前缀；标签由页面给，剥掉，否则叠两层。 */
+  function stripLabel(t) {
+    return String(t).replace(RE_BR, '').replace(RE_CL, '');
+  }
+
+  function annotsHTML(d) {
+    const rep = d.report;
+    const paras = paragraphs(d.text);
+    const annots = Array.isArray(rep.annots) ? rep.annots : [];
+    const byIndex = notesByPara(annots, paras.length);
+    const rows = paras.map((p, idx) => {
+      const i = idx + 1;
+      const notes = byIndex.get(idx) || [];
+      const marg = notes.length
+        ? notes.map((n) =>
+            '<div class="nt"><span class="idx">' + esc(n.n || '') + '</span><span class="tag">' + esc(fixTag(n.tag)) + '</span><p>' + esc(n.text || '') + '</p></div>'
+          ).join('')
+        : '<div class="nt"><p style="color:var(--faint)">这一段没有问题。</p></div>';
+      return (
+        '<div class="row">' +
+          '<div class="body"><p>' + marked(p, notes) + '</p></div>' +
+          '<div class="marg"><div class="pno">段落 ' + i + '</div>' + marg + '</div>' +
+        '</div>'
+      );
+    });
+    if (!rows.length) return '';
+    return '<div class="sec"><div class="hd"><h2><span class="no"></span>原文批注</h2><span class="sub">灰粗斜体 = 有问题的地方 · 上标编号对应右侧原因</span></div>' + rows.join('') + '</div>';
+  }
+
+  function rewriteHTML(d) {
+    const list = Array.isArray(d.report.rewrite) ? d.report.rewrite : [];
+    if (!list.length) return '';
+    const rows = list.map((r) => {
+      const paras = (Array.isArray(r.paras) ? r.paras : []).map((x) => '<p>' + esc(x) + '</p>').join('');
+      const whys = (Array.isArray(r.why) ? r.why : []);
+      const marg = whys.length
+        ? '<div class="pno">为什么这样写</div><ul>' + whys.map((w) => '<li>' + esc(w) + '</li>').join('') + '</ul>'
+        : '';
+      return '<div class="row"><div class="body">' + paras + '</div><div class="marg">' + marg + '</div></div>';
+    });
+    return '<div class="sec rw"><div class="hd"><h2><span class="no"></span>改写版</h2><span class="sub">左栏可直接读 · 右栏是这一段的处理理由</span></div>' + rows.join('') + '</div>';
+  }
+
+  function summaryHTML(d) {
+    const list = Array.isArray(d.report.summary) ? d.report.summary : [];
+    if (!list.length) return '';
+    return '<div class="sec"><div class="hd"><h2><span class="no"></span>内容总结</h2><span class="sub">它到底在说什么</span></div>' +
+      '<ol class="plain">' + list.map((s) => '<li><div class="b" style="font-family:var(--serif);font-size:17px;line-height:1.95">' + esc(s) + '</div></li>').join('') + '</ol></div>';
+  }
+
+  function factsHTML(d) {
+    const list = Array.isArray(d.report.facts) ? d.report.facts : [];
+    if (!list.length) return '';
+    const rows = list.map((f) => {
+      const kind = f.kind === 'bad' ? 'bad' : f.kind === 'ok' ? 'ok' : 'mid';
+      return '<tr><td class="c">' + esc(f.claim) + '</td><td class="v ' + kind + '">' + esc(f.verdict) + '</td><td class="b">' + esc(f.basis) + '</td></tr>';
+    }).join('');
+    return '<div class="sec"><div class="hd"><h2><span class="no"></span>事实与数据核对</h2><span class="sub">说法 · 判定 · 依据</span></div>' +
+      '<table class="facts"><thead><tr><th>原文说法</th><th>判定</th><th>依据</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
+  }
+
+  function adviceHTML(d) {
+    const list = Array.isArray(d.report.advice) ? d.report.advice : [];
+    if (!list.length) return '';
+    const items = list.map((a) =>
+      '<li><div><div class="t">' + esc(a.t) + '</div><div class="b">' + esc(a.body) + '</div>' +
+      (a.how ? '<div class="how"><b>怎么查：</b>' + esc(a.how) + '</div>' : '') + '</div></li>'
+    ).join('');
+    return '<div class="sec adv"><div class="hd"><h2><span class="no"></span>中文表达建议</h2><span class="sub">每一条都能当场做</span></div>' +
+      '<ol class="plain">' + items + '</ol></div>';
+  }
+
+  function reportInner(d) {
+    const rep = d.report;
+    const modeName = d.mode === 'rig' ? '严谨化' : '通俗化';
+    const day = new Date().toLocaleDateString('zh-CN');
+    const vlist = (Array.isArray(rep.verdict) ? rep.verdict : [rep.verdict]).filter(Boolean);
+    const VLAB = ['病症', '处理'];
+    const verdict = vlist.map((v, i) =>
+      '<p><span class="lb">' + (VLAB[i] || '　') + '</span><span class="tx">' + esc(stripLabel(v)) + '</span></p>'
+    ).join('');
+    return (
+      '<div class="hd noprint"><span class="l">' + modeName + ' · 一份完整的批注</span>' +
+        '<span class="r"><button class="btn" id="expHtml">导出 HTML</button>' +
+        '<button class="btn" id="expMd">Markdown</button>' +
+        '<button class="btn" id="again">换一篇</button></span></div>' +
+      titleHTML(rep) + bylineHTML(rep) +
+      (verdict ? '<div class="verdict">' + verdict + '</div>' : '') +
+      annotsHTML(d) + rewriteHTML(d) + summaryHTML(d) + factsHTML(d) + adviceHTML(d) +
+      '<div class="foot"><span>指标由 zh-sci-lens 引擎本地实测 · 判断与改写由模型撰写</span><span>' + day + '</span></div>'
+    );
+  }
+
+  function numberSections(el) {
+    let n = 0;
+    el.querySelectorAll('.sec h2 .no').forEach((s) => {
+      s.textContent = String(n++).padStart(2, '0');
+    });
+  }
+
+  /* ---------- 渲染 ---------- */
+  const root = $('#root');
+
+  function paint() {
+    if (S.screen === 'cover') {
+      root.innerHTML = coverHTML();
+      bindCover();
+    } else if (S.screen === 'guide') {
+      root.innerHTML = guideHTML();
+      bindGuide();
+    } else {
+      root.innerHTML = '<div class="wrap"><div class="doc">' + reportInner(S.data) + '</div></div>';
+      numberSections(root);
+      bindReport();
+      window.scrollTo({ top: 0, behavior: 'instant' in document.documentElement.style ? 'instant' : 'auto' });
+    }
+  }
+
+  /* ---------- 封面绑定 ---------- */
+  function bindCover() {
+    const ta = $('#src');
+    const meter = $('#meter');
+    const cnt = $('#cnt');
+    const modes = Array.from(document.querySelectorAll('.mode'));
+
+    if (S.text) ta.value = S.text;
+    update();
+
+    ta.addEventListener('input', () => {
+      S.text = ta.value;
+      update();
+    });
+
+    function update() {
+      const t = ta.value;
+      const chars = t.replace(/\s/g, '').length;
+      cnt.textContent = nfmt(chars) + ' 字';
+      const m = measure(t);
+      S.metrics = m;
+      modes.forEach((b) => (b.disabled = !m));
+      if (!m) {
+        meter.innerHTML = '<span class="none">引擎在本地算，不上传。</span>';
+        return;
+      }
+      const a = m.agg;
+      const lean = m.mode === 'rig' ? '偏向不严谨' : '偏向难懂';
+      meter.innerHTML = [
+        '<span><span class="n">' + nfmt(a.chars) + '</span> 字</span>',
+        '<span><span class="n">' + m.paras + '</span> 段</span>',
+        '<span><i class="dot ' + cls(a.read_score >= TH.read) + '"></i>可读 <span class="n">' + a.read_score + '</span></span>',
+        '<span><i class="dot ' + cls(a.fun_score >= TH.fun) + '"></i>趣味 <span class="n">' + a.fun_score + '</span></span>',
+        '<span><i class="dot ' + cls(a.assert_strength <= TH.assert) + '"></i>断言 <span class="n">' + a.assert_strength.toFixed(1) + '</span></span>',
+        '<span class="sep">|</span>',
+        '<span>' + lean + '</span>',
+      ].join('');
+    }
+
+    modes.forEach((b) =>
+      b.addEventListener('click', () => {
+        S.mode = b.dataset.mode;
+        S.err = '';
+        if (S.pending && S.pending.mode === S.mode) {
+          S.data = S.pending;
+          S.screen = 'report';
+        } else {
+          S.screen = 'guide';
+        }
+        paint();
+      })
+    );
+  }
+
+  /* ---------- 导引绑定 ---------- */
+  function bindGuide() {
+    const msg = $('#copyMsg');
+    $('#copyPrompt').addEventListener('click', async () => {
+      const p = buildPrompt();
+      try {
+        await navigator.clipboard.writeText(p);
+        msg.textContent = '已复制（' + nfmt(p.length) + ' 字符），粘给 agent 就行。';
+        msg.style.color = 'var(--good)';
+      } catch (e) {
+        const w = window.open('', '_blank');
+        if (w) { w.document.write('<pre style="white-space:pre-wrap;font:13px/1.7 ui-monospace">' + esc(p) + '</pre>'); }
+        msg.textContent = '剪贴板被浏览器拦下了，已在新标签页打开全文，手动复制。';
+        msg.style.color = 'var(--warn)';
+      }
+    });
+
+    $('#back').addEventListener('click', () => { S.screen = 'cover'; paint(); });
+
+    $('#loadJson').addEventListener('click', () => {
+      const raw = $('#json').value.trim();
+      const box = $('#loadMsg');
+      if (!raw) { box.textContent = '先粘贴 agent 返回的 JSON。'; return; }
+      let obj = null;
+      try {
+        obj = JSON.parse(raw.replace(/^```(?:json)?/i, '').replace(/```$/, '').trim());
+      } catch (e) {
+        box.textContent = '不是合法 JSON：' + e.message;
+        return;
+      }
+      const d = normalize(obj);
+      if (!d || !d.report || !d.report.title) {
+        box.textContent = 'JSON 能解析，但里面没有 title —— 可能粘的是别的东西。';
+        return;
+      }
+      if (!d.text) d.text = S.text;
+      if (!d.metrics) d.metrics = S.metrics;
+      S.data = d;
+      S.screen = 'report';
+      paint();
+    });
+  }
+
+  /* ---------- 报告绑定 ---------- */
+  function bindReport() {
+    const d = S.data;
+    $('#expHtml').addEventListener('click', () => exportHTML(d));
+    $('#expMd').addEventListener('click', () => exportMD(d));
+    $('#again').addEventListener('click', () => { S.screen = 'cover'; S.data = null; paint(); });
+  }
+
+  /* ---------- 导出 ---------- */
+  function download(name, mime, body) {
+    const blob = new Blob([body], { type: mime + ';charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  }
+
+  const slug = (t) => '双镜批注本-' + String(t || '报告').replace(/[\\/:*?"<>|\s]+/g, '-').slice(0, 40);
+
+  function exportHTML(d) {
+    const css = $('#system').textContent;
+    const body = reportInner(d).replace(/<div class="hd noprint">[\s\S]*?<\/div>/, '');
+    const doc =
+      '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">' +
+      '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+      '<title>' + esc(d.report.title) + '</title><style>' + css + '</style>' +
+      '<style>body{background:#fff}</style></head><body>' +
+      '<div class="wrap"><div class="doc">' + body + '</div></div></body></html>';
+    download(slug(d.report.title) + '.html', 'text/html', doc);
+  }
+
+  function exportMD(d) {
+    const rep = d.report;
+    const paras = paragraphs(d.text);
+    const byIndex = notesByPara(rep.annots, paras.length);
+    const L = [];
+    L.push('# ' + rep.title, '');
+    if (rep.byline) L.push(rep.byline.slice(0, 5).join(' · '), '');
+    (rep.verdict || []).forEach((v) => L.push(v, ''));
+    L.push('## 原文批注', '');
+    paras.forEach((p, i) => {
+      L.push('**段落 ' + (i + 1) + '**', '', p, '');
+      const notes = byIndex.get(i) || [];
+      if (!notes.length) L.push('- 这一段没有问题。', '');
+      notes.forEach((n) => L.push('- **' + (n.n || '') + '. ' + fixTag(n.tag) + '** — ' + (n.text || '')));
+      L.push('');
+    });
+    if (rep.rewrite && rep.rewrite.length) {
+      L.push('## 改写版', '');
+      rep.rewrite.forEach((r) => {
+        (r.paras || []).forEach((x) => L.push(x, ''));
+        (r.why || []).forEach((w) => L.push('> ' + w));
+        L.push('');
+      });
+    }
+    if (rep.summary && rep.summary.length) {
+      L.push('## 内容总结', '');
+      rep.summary.forEach((s, i) => L.push(i + 1 + '. ' + s));
+      L.push('');
+    }
+    if (rep.facts && rep.facts.length) {
+      L.push('## 事实与数据核对', '', '| 原文说法 | 判定 | 依据 |', '| --- | --- | --- |');
+      rep.facts.forEach((f) => L.push('| ' + [f.claim, f.verdict, f.basis].map((x) => String(x || '').replace(/\|/g, '\\|')).join(' | ') + ' |'));
+      L.push('');
+    }
+    if (rep.advice && rep.advice.length) {
+      L.push('## 中文表达建议', '');
+      rep.advice.forEach((a, i) => {
+        L.push(i + 1 + '. **' + a.t + '**', '   ' + a.body);
+        if (a.how) L.push('   > 怎么查：' + a.how);
+        L.push('');
+      });
+    }
+    download(slug(rep.title) + '.md', 'text/markdown', L.join('\n'));
+  }
+
+  /* ---------- 任务包 ---------- */
+  /* 与插件版 lib/host/prompt.js 保持一致：读者模型 + 白话要求 + 标签白名单。
+     改这里就得同步改那边，两边是同一份契约的两个入口。 */
+  function buildPrompt() {
+    const m = S.metrics;
+    const modeLine =
+      S.mode === 'rig'
+        ? '改法：严谨化（rig）。把断言压回它证据能撑住的位置：该加条件的加条件，该降级的降级，该删的删。不改知识，只改确定性。'
+        : '改法：通俗化（pop）。让一个完全不懂这个专业的人，读完一遍就能用自己的话把这件事讲给别人听。做法是：把「为什么」提到前面，把名词换成动作，删掉重复的情绪升级。不改事实，只改讲法。';
+
+    const metricLine = m
+      ? '引擎实测（原文，byline 直接用这些数，不要自己估）：\n' +
+        '- 字数 ' + nfmt(m.agg.chars) + '；段数 ' + m.paras + '；平均句长 ' + m.agg.mean_len +
+        '；句长变异 ' + m.agg.sd_len + '\n' +
+        '- 断言强度 ' + m.agg.assert_strength.toFixed(1) + '（越低越好，阈值 ≤8）——这是内部指标，只用来填 byline，不要写进正文\n' +
+        '- 可读分 ' + m.agg.read_score + '（阈值 ≥60）；趣味分 ' + m.agg.fun_score + '（阈值 ≥50）\n' +
+        '- 情绪词/千字 ' + m.agg.sensational_per_k.toFixed(1) + '（阈值 ≤3）；破折号/千字 ' + m.agg.dash_per_k.toFixed(1)
+      : '';
+
+    const schema = [
+      '{',
+      '  "mode": "' + S.mode + '",',
+      '  "text": "原文全文，逐段用 \\n\\n 分隔（渲染时按它分段）",',
+      '  "report": {',
+      '    "title": "报告标题，一句人话，说清这份稿子把什么改成了什么",',
+      '    "titleAccent": "标题里要用朱红着重的那一小段，必须逐字出现在 title 里",',
+      '    "byline": ["原文 173 字", "3 段", "5 条批注", "改写 169 字", "可读分 49，低于阈值"],',
+      '    "verdict": [',      '      "【病症】2–4 句。① 指出原文哪一句、哪个词有问题，把那几个字原样引出来（用「」）。② 读者读到那儿会怎么理解错——把那个误解写出来，让人看见。③ 如果这个毛病在全文重复了，说清重复了几次。",',      '      "【处理】2–4 句。① 先说改的顺序：先做什么、再做什么。② 给一个具体的「把 X 换成 Y」的例子。③ 说明哪些东西一个字没动（数字、结论、作者的立场）。"',      '    ],',
+      '    "annots": [{"i": 1, "notes": [{"n": 1, "tag": "两三字的日常说法", "quote": "原文里要标出的片段，逐字摘录", "text": "第一句：这里哪里不对，落到具体的词或数字上。第二句：应该改成什么。"}]}],',
+      '    "rewrite": [{"paras": ["改写后这一段的正文"], "why": ["为什么这样写，一条一句，说给外行听"]}],',
+      '    "summary": ["这段文字到底在说什么。写给没读过它的人：这件事是什么、为什么会这样、谁做了什么、结果是多少。"],',
+      '    "facts": [{"claim": "原文说法", "verdict": "二字判词", "kind": "bad|mid|ok", "basis": "依据，一句话"}],',
+      '    "advice": [{"t": "一条判断，人话，不用术语", "body": "为什么会这样，解释清楚", "how": "怎么查 / 怎么练，给一个当场能做的动作"}]',
+      '  }',
+      '}',
+    ].join('\n');
+
+    const tags = [
+      'note.tag 用下面这些日常说法，不要自创术语：',
+      '- 太大 —— 说了"最/极/巨大"，但没有比较对象，读者无法核对',
+      '- 没证据 —— 一个结论，前面没有交代它是谁算出来、怎么测出来的',
+      '- 说法偏了 —— 事实大体对，但说重了、说早了、说反了因果',
+      '- 说不通 —— 前后两句接不上，读者要自己补一整句话才看得懂',
+      '- 看不懂 —— 一堆名词挤在一起，中间没有一句缓冲',
+      '- 可以删 —— 这句删掉，读者不会少知道任何事',
+      '- 数字虚 —— 数字有，但缺少参照，读者不知道它算大还是小',
+      '- 换个说法 —— 意思没错，但话是公文腔，日常没人这么讲',
+    ].join('\n');
+
+    const rules = [
+      '1. quote 必须逐字出现在原文第 i 段里，不要改写、不要加省略号。页面靠它定位并加灰粗斜体。',
+      '2. i 是段号，从 1 开始。没有问题的段落也要占位写 {"i": N, "notes": []}。',
+      '3. n 全文从 1 连续递增，每条 note 正好一条 quote。',
+      '4. byline 里「N 条批注」要与 notes 总数一致；byline 最多 5 条、每条不超过 14 字。',
+      '5. rewrite 覆盖全文，一段一条，按原顺序。',
+      '5b. summary 必写，3–5 条；title、byline、verdict、annots、rewrite、summary 一个都不能省。',
+      '6. facts 只在原文确实含可核验的定量断言（数字+单位、年份、百分比、具体史实）时写；一条都没有就写空数组。',
+      '7. 只做指定的那一种改法，不要顺手把另一种也做了。',
+      '8. 全部中文；JSON 里每个字符串都写成一行，不要在字符串内部换行。',
+      '8b. verdict 的两条不要自己写「病症：」「处理：」开头，页面会给标签；每条 2–4 句，宁可写具体，不要写短。',
+      '9. 报告本身不许出现行话：断言强度、后置定语、名词化、语域、机制句、逻辑主语、量化断言、元语言、修辞遮蔽、信息密度、语篇、衔接、指代、限定语、模态、命题、绝对化表述、论述层次、量产级、实用化、因果链、标准声明、论证结构、叙事节奏 —— 一个都不要出现在 verdict / annots / summary / advice 里。',
+      '10. 每条批注都要能被原文作者指认：「你说的是哪个字？」答不出来就是空话，重写。',
+      '11. summary 不要以"作者想讲的是"「本文旨在」开头（那是作文评语，不是内容）。直接讲内容本身。',
+      '12. summary 允许而且鼓励打一个比方，让外行抓住这件事的形状；比方的下一句必须写清它在哪里不成立。',
+    ].join('\n');
+
+    return [
+      '你是一位中文编辑，专门把学术或科普文本，改到它该在的位置。',
+      '',
+      '坐在你对面的读者是这样的：他不了解这个专业，也不打算先学会术语再回头看结论。',
+      '他只想在读完一遍之后，能用自己的话把这件事复述给另一个人听。',
+      '所以你写下的每一句——批注、总结、建议、点评——都必须让这个人当场读懂。读不懂的判断等于没写。',
+      '',
+      '两条自我检查，每次落笔前过一遍：',
+      '一，如果这句话被原文作者看到，他能不能指着某个具体的词说"你指的是这里"？不能，就是印象，不是诊断。',
+      '二，把这句话念给一个没读过原文的人听，他能不能接上"哦，原来是这样"？接不上，就是用了行话。',
+      '',
+      modeLine,
+      '',
+      metricLine,
+      '',
+      '原文（共 ' + Array.from(String(S.text)).length + ' 字，' + paragraphs(S.text).length + ' 段）：',
+      '',
+      '<<<TEXT',
+      S.text,
+      'TEXT>>>',
+      '',
+      schema,
+      '',
+      tags,
+      '',
+      '硬规则：',
+      rules,
+      '',
+      '只输出这个 JSON 对象本身。',
+    ].filter((x) => x !== null && x !== undefined).join('\n');
+  }
+
+  /* ---------- 启动 ---------- */
+  if (window.REPORT) {
+    const d = normalize(window.REPORT);
+    if (d) {
+      if (!d.text && window.REPORT.text) d.text = window.REPORT.text;
+      S.data = d;
+      S.text = d.text || '';
+      S.metrics = d.metrics || measure(S.text);
+      S.mode = d.mode;
+      S.screen = 'report';
+    }
+  }
+  paint();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="中文双镜片">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#B4472C"/>
+      <stop offset="1" stop-color="#8A2F1B"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#g)"/>
+  <g fill="none" stroke="#FBF0EC" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <ellipse cx="24" cy="22" rx="8.6" ry="8.6"/>
+    <ellipse cx="24" cy="42" rx="8.6" ry="8.6"/>
+    <path d="M40 22h10M40 42h10M49 22l-4 20M49 42l-4-20"/>
+  </g>
+</svg>

@@ -1,0 +1,5 @@
+- insert:
+    - id: zh-sci-lens
+      name: 'dsh-zh-sci-lens'
+      config:
+        specDir: ''
